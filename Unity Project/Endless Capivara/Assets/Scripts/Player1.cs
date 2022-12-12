@@ -9,6 +9,12 @@ public class Player1 : MonoBehaviour
     public float jumpLength;
     public float jumpHeight;
     public float slideLength;
+    public float slideHeight;
+    public int MaxLife = 3;
+    public float minSpeed = 10f;
+    public float maxSpeed = 30f;
+    public GameObject model;
+    public float invincibleTime;
 
     private Animator anim;
     private Rigidbody rb;
@@ -19,9 +25,12 @@ public class Player1 : MonoBehaviour
     private float jumpStart;
     private bool sliding = false;
     private float slideStart;
-    private Vector3 boxColliderSize;
+    //private Vector3 boxColliderSize;
     private bool isSwipping = false;
     private Vector2 startingTouch;
+    private int currentLife;
+    private bool invincible = false;
+    private UiManager uiManager;
 
 
     // Start is called before the first frame update
@@ -30,7 +39,10 @@ public class Player1 : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         anim = GetComponentInChildren<Animator>();
         boxCollider = GetComponent<BoxCollider>();
-        boxColliderSize = boxCollider.size; 
+        //boxColliderSize = boxCollider.size;
+        currentLife = MaxLife;
+        speed = minSpeed;
+        uiManager = FindObjectOfType<UiManager>();
     }
 
     // Update is called once per frame
@@ -125,8 +137,16 @@ public class Player1 : MonoBehaviour
             {
                 sliding = false;
                 anim.SetBool("Sliding", false);
-                boxCollider.size = boxColliderSize;
+                //boxCollider.size = boxColliderSize;
             }
+            else
+            {
+                verticalTargetPosition.y = Mathf.Sin(ratio * Mathf.PI) * slideHeight;
+            }
+        }
+        else
+        {
+            verticalTargetPosition.y = Mathf.MoveTowards(verticalTargetPosition.y, 0, 5 * Time.deltaTime);
         }
 
 
@@ -168,11 +188,61 @@ public class Player1 : MonoBehaviour
             slideStart = transform.position.z;
             anim.SetFloat("JumpSpeed", speed / slideLength);
             anim.SetBool("Sliding", true);
-            Vector3 newSize = boxCollider.size;
-            newSize.y = newSize.y / 2;
-            boxCollider.size = newSize;
+            //Vector3 newSize = boxCollider.size;
+            //newSize.y = newSize.y / 2;
+            //boxCollider.size = newSize;
             sliding = true;
 
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (invincible)
+            return;
+
+        if(other.CompareTag("Obstacle"))
+        {
+            currentLife--;
+            uiManager.UpdateLive(currentLife);
+            anim.SetTrigger("Hit");
+            speed = 0;
+            if (currentLife <= 0)
+            {
+                // GAME OVER
+            }
+            else
+            {
+                StartCoroutine(Blinking(invincibleTime));
+            }
+        }
+    }
+
+    IEnumerator Blinking(float time)
+    {
+        invincible = true;
+        float timer = 0;
+        float currentBlinking = 1f;
+        float lastBlinking = 0f;
+        float blinkingPeriod = 0.1f;
+        bool enabled = false;
+        yield return new WaitForSeconds(1f);
+        speed = minSpeed;
+        while(timer < time && invincible)
+        {
+            model.SetActive(enabled);
+            yield return null;
+            timer += Time.deltaTime;
+            lastBlinking += Time.deltaTime;
+            if (blinkingPeriod < lastBlinking)
+            {
+                lastBlinking = 0;
+                currentBlinking = 1f - currentBlinking;
+                enabled = !enabled;
+            }
+        }
+        model.SetActive(true);
+        invincible = false;
+
     }
 }
