@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player1 : MonoBehaviour
+public class Player : MonoBehaviour
 {
     public float laneSpeed;
     public float speed;
@@ -15,10 +15,11 @@ public class Player1 : MonoBehaviour
     public float maxSpeed = 30f;
     public GameObject model;
     public float invincibleTime;
+    public float multiplySpeed;
 
     private Animator anim;
     private Rigidbody rb;
-    private BoxCollider boxCollider;
+    //private BoxCollider boxCollider;
     private int currentLane = 1;
     private Vector3 verticalTargetPosition;
     private bool jumping = false;
@@ -32,6 +33,7 @@ public class Player1 : MonoBehaviour
     private bool invincible = false;
     private UiManager uiManager;
     private int currentCoins;
+    private float score;
 
 
     // Start is called before the first frame update
@@ -39,7 +41,7 @@ public class Player1 : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         anim = GetComponentInChildren<Animator>();
-        boxCollider = GetComponent<BoxCollider>();
+        //boxCollider = GetComponent<BoxCollider>();
         //boxColliderSize = boxCollider.size;
         currentLife = MaxLife;
         speed = minSpeed;
@@ -49,6 +51,8 @@ public class Player1 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        score += Time.deltaTime * speed;
+        uiManager.UpdateScore((int)score);
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             ChangeLane(-1);
@@ -261,5 +265,12 @@ public class Player1 : MonoBehaviour
     void CallMenu()
     {
         GameManager.gm.EndRun();
+    }
+
+    public void IncreaseSpeed()
+    {
+        speed *= multiplySpeed;
+        if (speed >= maxSpeed)
+            speed = maxSpeed;
     }
 }

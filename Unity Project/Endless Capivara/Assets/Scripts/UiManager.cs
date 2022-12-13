@@ -8,10 +8,15 @@ public class UiManager : MonoBehaviour
     public Image[] lifeHearts;
     public Text coinText;
     public GameObject gameOverPanel;
+    public Text scoreText;
 
     public void UpdateCoins(int coin)
     {
         coinText.text = coin.ToString();
+    }
+    public void UpdateScore(int score)
+    {
+        scoreText.text = score.ToString();
     }
     public void UpdateLive(int lives)
     {

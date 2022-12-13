@@ -21,3 +21,4 @@ public class Menu : MonoBehaviour
         GameManager.gm.StartRun();
     }
 }
+     
