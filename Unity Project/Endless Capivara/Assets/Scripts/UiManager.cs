@@ -7,6 +7,7 @@ public class UiManager : MonoBehaviour
 {
     public Image[] lifeHearts;
     public Text coinText;
+    public GameObject gameOverPanel;
 
     public void UpdateCoins(int coin)
     {

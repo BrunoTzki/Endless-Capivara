@@ -196,7 +196,7 @@ public class Player1 : MonoBehaviour
 
         }
     }
-
+     
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Coin"))
@@ -216,7 +216,12 @@ public class Player1 : MonoBehaviour
             speed = 0;
             if (currentLife <= 0)
             {
-                // GAME OVER
+                //GAME OVER
+
+                speed = 0;
+                anim.SetBool("Dead", true);
+                uiManager.gameOverPanel.SetActive(true);
+                Invoke("CallMenu", 2f);
             }
             else
             {
@@ -251,5 +256,10 @@ public class Player1 : MonoBehaviour
         model.SetActive(true);
         invincible = false;
 
+    }
+    
+    void CallMenu()
+    {
+        GameManager.gm.EndRun();
     }
 }
