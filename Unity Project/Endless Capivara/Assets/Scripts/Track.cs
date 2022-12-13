@@ -6,12 +6,17 @@ public class Track : MonoBehaviour
 {
     public GameObject[] obstacles;
     public Vector2 numberOfObstacles;
+    public GameObject coin;
+    public Vector2 numberOfCoins;
 
     public List<GameObject> newObstacles;
+    public List<GameObject> newCoins;
     // Start is called before the first frame update
     void Start()
     {
         int newNumberOfObstacles = (int)Random.Range(numberOfObstacles.x, numberOfObstacles.y);
+        int newNumberOfCoins = (int)Random.Range(numberOfCoins.x, numberOfCoins.y);
+
 
         for (int i = 0; i < newNumberOfObstacles; i++)
         {
@@ -19,9 +24,16 @@ public class Track : MonoBehaviour
             newObstacles[i].SetActive(false);
         }
 
-        PositionateObstacles();
-    }
+        for (int i = 0; i < newNumberOfCoins; i++)
+        {
+            newCoins.Add(Instantiate(coin, transform));
+            newCoins[i].SetActive(false);
+        }
 
+        PositionateObstacles();
+        PositionateCoins();
+    }
+ 
     void PositionateObstacles()
     {
         for (int i = 0; i < newObstacles.Count; i++)
@@ -31,15 +43,34 @@ public class Track : MonoBehaviour
             newObstacles[i].transform.localPosition = new Vector3(0, 0, Random.Range(posZmin, posZmax));
             newObstacles[i].SetActive(true);
 
+            if (newObstacles[i].GetComponent<ChangeLane>() != null)
+                newObstacles[i].GetComponent<ChangeLane>().PositionLane();
+         
         }
     }
+
+    void PositionateCoins()
+    {
+        float minZpos = 10f;
+
+        for (int i = 0; i < newCoins.Count; i++)
+        {
+            float maxZpos = minZpos + 5f;
+            float randomZpos = Random.Range(minZpos, maxZpos);
+            newCoins[i].transform.localPosition = new Vector3(transform.position.x, transform.position.y, randomZpos);
+            newCoins[i].SetActive(true);
+            newCoins[i].GetComponent<ChangeLane>().PositionLane();
+            minZpos = randomZpos + 1;
+        }
+    }   
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             transform.position = new Vector3(0, 0, transform.position.z + 200 * 2);
-            Invoke ("PositionateObstacles", 4f);
+            PositionateObstacles();
+            PositionateCoins();
         }
     }
 

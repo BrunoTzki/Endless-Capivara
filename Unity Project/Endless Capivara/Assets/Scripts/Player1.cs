@@ -31,6 +31,7 @@ public class Player1 : MonoBehaviour
     private int currentLife;
     private bool invincible = false;
     private UiManager uiManager;
+    private int currentCoins;
 
 
     // Start is called before the first frame update
@@ -198,6 +199,12 @@ public class Player1 : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.CompareTag("Coin"))
+        {
+            currentCoins++;
+            uiManager.UpdateCoins(currentCoins);
+            other.gameObject.SetActive(false);
+        }
         if (invincible)
             return;
 
